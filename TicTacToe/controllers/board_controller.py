@@ -20,25 +20,52 @@ class BoardController:
             print(f"Current choice is filled by user {curr.user.name}")
         board[x][y] = choice.choice
 
-        if self.isWinner(board, x, y):
+        if self.isWinner(board, x, y, choice.choice):
             print(f"winner is {choice.user.name}")
             sys.exit(0)
 
-    def isWinner(self, board, x, y):
-
+    def isWinner(self, board, x, y, choice):
         # check rows
-        if (board[x][0] and board[x][1] and board[x][2]) and board[x][0] == board[x][1] == board[x][2]:
+        rows = True
+        for i in range(3):
+            if board[x][i] != choice:
+                rows = False
+                break
+        if rows:
             return True
 
+        cols = True
         # check cols
-        if (board[0][y] and board[1][y] and board[2][y]) and board[0][y] == board[1][y] == board[2][y]:
+        for j in range(3):
+            if board[j][y] != choice:
+                cols = False
+                break
+        if cols:
             return True
 
+        d1 = True
+        i = j = 0
         # check diagonals
-        if (board[0][0] and board[1][1] and board[2][2]) and board[0][0] == board[1][1] == board[2][2]:
+        while i < 3 and j < 3:
+            if board[i][j] != choice:
+                d1 = False
+                break
+            i += 1
+            j += 1
+        if d1:
             return True
 
-        if (board[2][0] and board[1][1] and board[0][2]) and board[2][0] == board[1][1] == board[0][2]:
+        # second diagonal
+        d2 = True
+        i = 3 - 1
+        j = 0
+        while i >= 0 and j < 3:
+            if board[i][j] != choice:
+                d2 = False
+                break
+            i -= 1
+            j += 1
+        if d2:
             return True
 
         if not self.boardService.hasEmptyCell(board):
