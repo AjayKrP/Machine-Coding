@@ -15,7 +15,7 @@ class BoardService(BoardServiceInterface):
         empty = False
         for i in range(3):
             for j in range(3):
-                if board[i][j] == None:
+                if board[i][j] is None:
                     empty = True
                     break
         return empty

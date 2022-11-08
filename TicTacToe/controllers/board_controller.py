@@ -21,7 +21,7 @@ class BoardController:
         board[x][y] = choice.choice
 
         if self.isWinner(board, x, y, choice.choice):
-            print(f"winner is {choice.user.name}")
+            print(f"winner is {choice.user.getName()}")
             sys.exit(0)
 
     def isWinner(self, board, x, y, choice):
