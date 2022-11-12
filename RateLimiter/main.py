@@ -1,12 +1,22 @@
 from abc import ABC, abstractmethod
-import threading
 import time
-lock = threading.Lock()
+
 
 class Limiter(ABC):
     @abstractmethod
     def rate_limit(self):
         pass
+
+
+class LeakyBucket(Limiter):
+    def rate_limit(self):
+        pass
+
+
+class SlidingWindow(Limiter):
+    def rate_limit(self):
+        pass
+
 
 class TokenBucket(Limiter):
     def __init__(self, bucket_size, req_per_minute) -> None:
@@ -16,13 +26,15 @@ class TokenBucket(Limiter):
         self.req_counter = 0
         self.first_request_time = time.time()
         self.refill()
-    
+
     def check_limit(self):
         now = time.time()
-        if int(now - self.first_request_time) >= self.bucket_size:
+        diff = int(now - self.first_request_time)
+        if diff >= self.bucket_size:
             self.refill()
+            self.first_request_time = time.time()
             print("Refilling bucket")
-        
+            print("Diff", diff)
 
     def refill(self):
         self.bucket = [False for _ in range(self.bucket_size)]
@@ -37,9 +49,11 @@ class TokenBucket(Limiter):
         self.req_counter += 1
         print(f"Req serverd: {self.req_counter}")
 
+
 class RateLimiter:
-    def __init__(self) -> None:
+    def __init__(self, req_per_sec) -> None:
         self.user_store = {}
+        self.req_per_sec = req_per_sec
 
     def init(self, ip):
         if ip in self.user_store:
@@ -52,7 +66,7 @@ class RateLimiter:
         limiter.rate_limit()
 
 
-rl = RateLimiter()
+rl = RateLimiter(10)
 while True:
     rl.limit('10.0.0.1')
     time.sleep(0.2)
